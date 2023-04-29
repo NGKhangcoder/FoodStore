@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <head th:replace="head :: page_head('Foodstore - HomePage','tag')" />
+    <link rel="stylesheet" type="text/css" th:href="@{/templateStyle.css}" />
+    <link rel="stylesheet" th:href="@{/base.css}">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div th:replace="navigation :: navigation" />
+
+        <div class="alert alert-success text-center mt-2" th:if="${message}">
+            [[${message}]]
+        </div>
+
+        <div class="text-center mt-2">
+            <h2 class="text-center text-dark">Users Manage</h2>
+        </div>
+
+
+        <div class="mt-2">
+            <a th:href="@{/users/new}" class="fas fa-user-plus fa-2x mr-2"></a>
+            <a th:href="@{/users/export/csv}" class="fas fa-file-csv fa-2x mr-2" style="color:#6d9820;"></a>
+            <a th:href="@{/users/export/excel}" class="fas fa-file-excel fa-2x mr-2" style="color: #094a27;"></a>
+            <a th:href="@{/users/export/pdf}" class="fas fa-file-pdf fa-2x" style="color: #d30000;"></a>
+        </div>
+
+        <div class="table-responsive ">
+            <div class="table-wrapper">
+                <div class="table-title">
+                    <form th:action="@{/users/page/1}" id="searchForm">
+                        <input type="hidden" name="sortField" th:value="${sortField}">
+                        <input type="hidden" name="sortDir" th:value="${sortDir}">
+                        <div class="row">
+                            <div class="col">
+                                <div class="show-entries" name="userPerPage">
+                                    <span>Display users per Page: </span>
+                                    <select name="numberOfEntries" id="entryDropdown">
+                                        <option value="5" th:selected="${numberOfEntries == 5 }">5</option>
+                                        <option value="10" th:selected="${numberOfEntries == 10 }">10</option>
+                                        <option value="15" th:selected="${numberOfEntries == 15}">15</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="search-box">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fas fa-search"></i></span>
+
+                                        <input type="text" class="form-control" th:value="${keyword}" name="keyword"
+                                            placeholder="Search&hellip;">
+
+                                        <button type="button" class="btn btn-secondary" onclick="clearFilter()">
+                                            <i class="fas fa-eraser"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- full detail -->
+                <table class="table table-bordered full-details">
+                    <thead>
+                        <tr>
+                            <th>
+                                <th th:replace="fragments :: label-column('/users','ID','id','tag')" />
+                            </th>
+                            <th>Image</th>
+                            <th>
+                                <th th:replace="fragments :: label-column('/users','First Name','firstName','tag')" />
+                            </th>
+                            <th>
+                                <th th:replace="fragments :: label-column('/users','Last Name','lastName','tag')" />
+                            </th>
+                            <th>
+                                <th th:replace="fragments :: label-column('/users','Roles','roles','tag')" />
+                            </th>
+                            <th>
+                                <th th:replace="fragments :: label-column('/users','Status','enabled','tag')" />
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${listUsers}">
+                            <td>
+                                <td th:replace="fragments :: link-column(${user.id},'tag')" />
+                            </td>
+                            <td class="text-center">
+                                <span th:if="${user.photos == null}" class="fas fa-portrait fa-3x icon-silver"></span>
+                                <img th:if="${user.photos != null}" th:src="@{${user.photosImagePath}}"
+                                    style="width: 100px" />
+
+                            </td>
+                            <td>
+                                <td th:replace="fragments :: link-column(${user.firstName},'tag')" />
+                            </td>
+                            <td>
+                                <td th:replace="fragments :: link-column(${user.lastName},'tag')" />
+                            </td>
+                            <td>
+                                <td th:replace="fragments :: link-column(${user.roles},'tag')" />
+                            </td>
+                            <td>
+                                <div th:replace="fragments :: status('/users/' +${user.id},${user.enabled},'none')" />
+                            </td>
+                            <td>
+                                <a href="#" class="view" title="View" data-toggle="tooltip">
+                                    <i class="far fa-eye"></i>
+                                </a>
+                                <div th:replace="fragments :: edit('/users/edit/' + ${user.id},'tag')" />
+                                <div
+                                    th:replace="fragments :: delete('/users/delete/' + ${user.id},${user.id},true,'tag')" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- less Detail -->
+                <div class="less-details">
+                    <div th:each="user : ${listUsers}" class="section_container ">
+                        <!-- section 1 -->
+                        <div class="first_section section text-center ">
+                            <img th:if="${user.photos != null}" th:src="@{${user.photosImagePath}}" style="width: 100px"
+                                class="rounded-circle" />
+                            <img th:if="${user.photos == null}" th:src="@{/images/default-user.png}"
+                                class="image_less_details ">
+                            <div class="ml-4">
+                                <td th:replace="fragments :: link-column(${user.id},'tag')" />
+                            </div>
+                        </div>
+                        <!-- section 2 -->
+                        <div class="second_section section mx-5  ">
+                            <div>
+                                <td th:replace="fragments :: link-column(${user.firstName},'tag')" />
+                            </div>
+                            <div>
+                                <td th:replace="fragments :: link-column(${user.lastName},'tag')" />
+                            </div>
+                            <div>
+                                <td th:replace="fragments :: link-column(${user.roles},'tag')" />
+                            </div>
+                        </div>
+                        <!-- section 3 -->
+                        <div class="third_section  section ">
+                            <div th:replace="fragments :: status('/users/' +${user.id},${user.enabled},'none')" />
+
+                            <div class="icons-action d-flex flex-column">
+                                <a href="#" class="view" title="View" data-toggle="tooltip">
+                                    <i class="far fa-eye"></i>
+                                </a>
+                                <div th:replace="fragments :: edit('/users/edit/' + ${user.id},'tag')" />
+                                <div
+                                    th:replace="fragments :: delete('/users/delete/' + ${user.id},${user.id},true,'tag')" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- pagination -->
+                <div th:replace="fragments :: pagination('/users')" />
+            </div>
+        </div>
+
+        <div th:replace="modal_fragments :: confirm_modal" />
+        <!-- footer -->
+        <div th:replace="footer :: footer" />
+    </div>
+    <script type="text/javascript">
+        moduleURL = "[[@{/users}]]";
+
+        $(document).ready(function () {
+
+            $(".link-delete").on("click", function (e) {
+                e.preventDefault();
+                showDeleteConfirmModal($(this), 'user');
+            });
+
+            $("#entryDropdown").on("change", function () {
+                $("#searchForm").submit();
+            });
+        });
+    </script>
+</body>
+
+</html>

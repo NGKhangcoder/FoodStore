@@ -1,0 +1,10 @@
+body{
+
+    background: url(./images/lily-banse--YHSwy6uqvk-unsplash.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    object-fit: contain;
+    background-size: cover;
+
+}

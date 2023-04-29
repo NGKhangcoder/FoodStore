@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <head th:replace="head :: page_head('Foodstore - orders','tag')" />
+    <link rel="stylesheet" type="text/css" th:href="@{/templateStyle.css}" />
+    <link rel="stylesheet" th:href="@{/base.css}">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div th:replace="navigation :: navigation" />
+
+        <div class="alert alert-success text-center mt-2" th:if="${message}">
+            [[${message}]]
+        </div>
+
+        <div class="text-center mt-2">
+            <h2 class="text-center text-dark">Orders Manage</h2>
+        </div>
+
+        <div class="table-responsive ">
+            <div class="table-wrapper">
+                <div class="table-title">
+                    <form th:action="@{/orders/page/1}" id="searchForm">
+                        <input type="hidden" name="sortField" th:value="${sortField}">
+                        <input type="hidden" name="sortDir" th:value="${sortDir}">
+                        <div class="row">
+                            <div class="col">
+                                <div class="search-box">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fas fa-search"></i></span>
+
+                                        <input type="text" class="form-control" th:value="${keyword}" name="keyword"
+                                            placeholder="Search&hellip;">
+
+                                        <button type="button" class="btn btn-secondary" onclick="clearFilter()">
+                                            <i class="fas fa-eraser"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <table class="table table-bordered full-details">
+                    <thead>
+                        <tr>
+                            <th>
+                                <th th:replace="fragments :: label-column('/orders','ID','id','tag')" />
+                            </th>
+                            <th>
+                                <th th:replace="fragments :: label-column('/orders','Customer','customer','tag')" />
+                            </th>
+                            <th>
+                                <th th:replace="fragments :: label-column('/orders','Total','total','tag')" />
+                            </th>
+                            <th>
+                                <th th:replace="fragments :: label-column('/orders','Order Time','orderTime','tag')" />
+                            </th>
+                            <th>
+                                <th
+                                    th:replace="fragments :: label-column('/orders','Destination','destination','tag')" />
+                            </th>
+                            <th>
+                                <th
+                                    th:replace="fragments :: label-column('/orders','Payment Method','PaymentMethod','tag')" />
+                            </th>
+
+
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${listOrders}">
+                            <td>
+                                <td th:replace="fragments :: link-column(${order.id},'tag')" />
+                            </td>
+                            <td>
+                                <a class="linkCustomerDetail" th:href="@{'/customers/detail/' + ${order.customer.id}}">
+                                    [[${order.customer.fullName}]]
+                                </a>
+                            </td>
+                            <td>
+                                <td th:replace="fragments :: link-column(${order.total},'tag')" />
+                            </td>
+
+                            <td>
+                                <td th:replace="fragments :: link-column(${order.orderTime},'tag')" />
+                            </td>
+                            <td class="hideable-column">[[${order.destination}]]</td>
+                            <td class="hideable-column">[[${order.paymentMethod}]]</td>
+
+                            <td>
+                                <a th:href="@{'/orders/detail/' + ${order.id}}" title="View details of this order"
+                                    class="view" data-toggle="tooltip">
+                                    <i class="far fa-eye"></i>
+                                </a>
+                                <div th:replace="fragments :: edit('/orders/edit/' + ${order.id},'tag')" />
+                                <div
+                                    th:replace="fragments :: delete('/orders/delete/' + ${order.id},${order.id},true,'tag')" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="less-details">
+                    <div th:each="order : ${listOrders}" class="section_container ">
+                        <div class="first_section section text-center ">
+
+                            <div class="ml-4">
+                                <td th:replace="fragments :: link-column(${order.id},'tag')" />
+                            </div>
+                        </div>
+
+                        <div class="second_section section mx-5  ">
+                            <td>
+                                <a class="linkCustomerDetail" th:href="@{'/customers/detail/' + ${order.customer.id}}">
+                                    [[${order.customer.fullName}]]
+                                </a>
+                            </td>
+                        </div>
+                        <div class="third_section  section ">
+                            <div class="icons-action d-flex flex-column">
+                                <a class="view" data-toggle="tooltip" th:href="@{'/orders/detail/' + ${order.id}}"
+                                    title="View details of this order">
+                                    <i class="far fa-eye"></i>
+                                </a>
+                                <div th:replace="fragments :: edit('/orders/edit/' + ${order.id},'tag')" />
+                                <div
+                                    th:replace="fragments :: delete('/orders/delete/' + ${order.id},${order.id},true,'tag')" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:replace="fragments :: pagination('/orders')" />
+            </div>
+        </div>
+
+        <div th:replace="modal_fragments :: confirm_modal" />
+        <!-- footer -->
+        <div th:replace="footer :: footer" />
+    </div>
+    <script th:src="@{/js/common_list.js}"></script>
+
+    <script type="text/javascript">
+        moduleURL = "[[@{/orders}]]";
+
+        $(document).ready(function () {
+            handleLinkViewCustomerDetails();//khi bấm vào xem detail của customer sẽ vào phương thức này
+            handleLinkViewOrderDetails();//khi bấm vào xem detail của order này sẽ vào phương thức này
+            handleLinkDeleteOrder();//khi bấm vào delete order thì sẽ vào phương thức này
+        });
+
+        function handleLinkViewCustomerDetails() {
+            $(".linkCustomerDetail").on("click", function (e) {
+                e.preventDefault();
+                linkDetailURL = $(this).attr("href");
+                $("#customerDetailModal").modal("show").find(".modal-content").load(linkDetailURL);
+            });
+        }
+
+        function handleLinkViewOrderDetails() {
+            $(".linkOrderDetail").on("click", function (e) {
+                e.preventDefault();
+                linkDetailURL = $(this).attr("href");
+                $("#orderDetailModal").modal("show").find(".modal-content").load(linkDetailURL);
+            });
+        }
+
+        function handleLinkDeleteOrder() {
+            $(".link-delete").on("click", function (e) {
+                e.preventDefault();
+                showDeleteConfirmModal($(this), 'order');
+            });
+        }
+
+    </script>
+</body>
+
+</html>

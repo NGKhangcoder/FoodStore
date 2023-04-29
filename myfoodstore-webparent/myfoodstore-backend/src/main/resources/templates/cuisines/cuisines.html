@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <head th:replace="head :: page_head('Foodstore - cuisines','tag')" />
+    <link rel="stylesheet" type="text/css" th:href="@{/templateStyle.css}" />
+    <link rel="stylesheet" th:href="@{/base.css}">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div th:replace="navigation :: navigation" />
+
+        <div class="alert alert-success text-center mt-2" th:if="${message}">
+            [[${message}]]
+        </div>
+
+        <div class="text-center mt-2">
+            <h2 class="text-center text-dark">Cuisines Manage</h2>
+        </div>
+        <div class="mt-2">
+            <a th:href="@{/cuisines/new}" title="add new cuisine" class=" fa-2x mr-2"><i
+                    class="fas fa-utensils"></i></a>
+        </div>
+
+        <div class="table-responsive ">
+            <div class="table-wrapper">
+                <div class="table-title">
+                    <form th:action="@{/cuisines/page/1}" id="searchForm">
+                        <input type="hidden" name="sortField" th:value="${sortField}">
+                        <input type="hidden" name="sortDir" th:value="${sortDir}">
+                        <div class="row">
+                            <div class="col">
+                                <div class="search-box">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fas fa-search"></i></span>
+
+                                        <input type="text" class="form-control" th:value="${keyword}" name="keyword"
+                                            placeholder="Search&hellip;">
+
+                                        <button type="button" class="btn btn-secondary" onclick="clearFilter()">
+                                            <i class="fas fa-eraser"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <table class="table table-bordered full-details">
+                    <thead>
+                        <tr>
+                            <th>
+                                <th th:replace="fragments :: label-column('/cuisines','ID','id','tag')" />
+                            </th>
+                            <th>
+                                <th th:replace="fragments :: label-column('/cuisines','Name','name','tag')" />
+                            </th>
+                            <th>
+                                Categories
+                            </th>
+                            <th>Flag</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="cuisine : ${listCuisines}">
+                            <td>
+                                <td th:replace="fragments :: link-column(${cuisine.id},'tag')" />
+                            </td>
+                            <td>
+                                <td th:replace="fragments :: link-column(${cuisine.name},'tag')" />
+                            </td>
+
+                            <td>
+                                <th:block th:each="cat : ${cuisine.categories}">
+                                    <span class="badge badge-secondary" th:text="${cat.name}"></span>
+                                </th:block>
+                            </td>
+                            <td class="text-center">
+                                <span th:if="${cuisine.logo == null}" class="fas fa-portrait fa-3x icon-silver"></span>
+                                <img th:if="${cuisine.logo != null}" th:src="@{${cuisine.logoPath}}"
+                                    style="width: 100px" />
+                            </td>
+
+                            <td>
+                                <a href="#" class="view" title="View" data-toggle="tooltip">
+                                    <i class="far fa-eye"></i>
+                                </a>
+                                <div th:replace="fragments :: edit('/cuisines/edit/' + ${cuisine.id},'tag')" />
+                                <div
+                                    th:replace="fragments :: delete('/cuisines/delete/' + ${cuisine.id},${cuisine.id},true,'tag')" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <div class="less-details">
+                    <div th:each="cuisine : ${listCuisines}" class="section_container ">
+                        <div class="first_section section text-center ">
+                            <img th:if="${cuisine.logo != null}" th:src="@{${cuisine.logoPath}}" style="width: 100px"
+                                class="rounded-circle" />
+                            <img th:if="${cuisine.logo == null}" class="logo_less_details">
+                            <div class="ml-4">
+                                <td th:replace="fragments :: link-column(${cuisine.id},'tag')" />
+                            </div>
+                        </div>
+
+                        <div class="second_section section mx-5  ">
+                            <div>
+                                <td th:replace="fragments :: link-column(${cuisine.name},'tag')" />
+                                <th:block th:each="cat : ${cuisine.categories}">
+                                    <span class="badge badge-secondary" th:text="${cat.name}"></span>
+                                </th:block>
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="third_section  section ">
+
+
+                            <div class="icons-action d-flex flex-column">
+                                <a href="#" class="view" title="View" data-toggle="tooltip">
+                                    <i class="far fa-eye"></i>
+                                </a>
+                                <div th:replace="fragments :: edit('/cuisines/edit/' + ${cuisine.id},'tag')" />
+                                <div
+                                    th:replace="fragments :: delete('/cuisines/delete/' + ${cuisine.id},${cuisine.id},true,'tag')" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:replace="fragments :: pagination('/cuisines')" />
+            </div>
+        </div>
+
+        <div th:replace="modal_fragments :: confirm_modal" />
+        <!-- footer -->
+        <div th:replace="footer :: footer" />
+    </div>
+    <script type="text/javascript">
+        moduleURL = "[[@{/cuisines}]]";
+        $(document).ready(function () {
+
+            $(".link-delete").on("click", function (e) {
+                e.preventDefault();
+                showDeleteConfirmModal($(this), 'cuisine');
+            });
+
+            $("#entryDropdown").on("change", function () {
+                $("#searchForm").submit();
+            });
+        });
+    </script>
+
+</body>
+
+</html>

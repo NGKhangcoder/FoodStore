@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0">
+    <title>Login - Food Store Admin</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+</head>
+
+<style>
+    .form-field {
+        position: relative;
+        margin: 20px
+    }
+
+    .form-input {
+        border-radius: 1px solid #eee;
+        width: 100%;
+        height: 50px;
+        padding: 0 10px;
+        transition: 0.25s;
+    }
+
+    .form-input:focus {
+        border-color: #6a5af9;
+    }
+
+    .form-label {
+        position: absolute;
+        top: 50%;
+        left: 11px;
+        transform: translateY(-50%);
+        user-select: none;
+        pointer-events: none;
+        color: #999;
+        transition: 0.25s ease;
+    }
+
+    .form-input:not(:placeholder-shown)+.form-label,
+    .form-input:focus+.form-label {
+        top: -2%;
+        padding: 0 10px;
+        display: inline-block;
+        background-color: #fff;
+        color: #6a5af9;
+    }
+</style>
+
+<body>
+    <div class="container-fluid text-center">
+
+        <div>
+            <img th:src="@{/images/download.png}" class="img-fluid" width="250px" />
+        </div>
+
+        <form th:action="@{/login}" method="post" style="max-width: 350px; margin: 0 auto">
+            <div th:if="${param.error}">
+                <p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
+
+            </div>
+
+            <div th:if="${param.logout}">
+                <p class="text-warning">You have been logged out.</p>
+            </div>
+
+            <div class="border border-secondary rounded p-3">
+                <p>Access to Food Store Control Panel</p>
+                <div class="form-field">
+                    <input type="email" name="email" class="form-control form-input" placeholder=" " required />
+                    <label for="email" class="form-label">E-Mail</label>
+                </div>
+
+                <div class="form-field">
+                    <input type="password" name="password" class="form-control form-input" placeholder=" " required />
+                    <label for="password" class="form-label">Password</label>
+
+                </div>
+
+                <p>
+                    <input type="checkbox" name="remember-me" />&nbsp;Remember Me
+                </p>
+                <p>
+                    <input type="submit" value="Login" class="btn btn-primary" />
+                </p>
+            </div>
+        </form>
+
+        <div th:replace="footer :: footer" />
+
+    </div>
+
+    <script>
+
+    </script>
+</body>
+
+
+</html>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2927/2927347.png" type="image/x-icon">
+    <head th:replace="head :: page_head('Foodstore - HomePage','tag')" />
+    <link rel="stylesheet" type="text/css" th:href="@{/index.css}" />
+</head>
+
+
+<body>
+    <div class="container-fluid">
+        <div th:replace="navigation :: navigation" />
+
+
+    </div>
+</body>
+
+</html>

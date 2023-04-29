@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+
+<body>
+
+    <!-- edit -->
+    <div th:fragment="edit(url,remove)" th:remove="tag">
+        <a th:href="@{${url}}" class="edit" title="Edit" data-toggle="tooltip">
+            <i class="fas fa-edit"></i>
+        </a>
+    </div>
+    <!-- delete -->
+    <div th:fragment="delete(url,entityId,isShow,remove)" th:remove="tag">
+        <th:block th:if="${isShow}">
+            <a th:href="@{${url}}" class="delete link-delete" title="Delete" data-toggle="tooltip"
+                th:entityId="${entityId}">
+                <i class=" fas fa-ban"></i>
+            </a>
+        </th:block>
+    </div>
+
+    <!-- enable -->
+    <div th:fragment="status(url,entityStatus,remove)" th:remove="tag">
+        <a th:href="@{${url} + '/enabled/false'}" th:if="${entityStatus== true}">
+            <i class="fas fa-check-circle fa-2x icon-green"></i>
+        </a>
+        <a th:href="@{${url} + '/enabled/true'}" th:if="${entityStatus == false}">
+            <i class="fas fa-circle fa-2x icon-dark"></i>
+        </a>
+    </div>
+
+    <!-- sort -->
+    <th th:fragment="label-column(moduleURL,columnLabel,fieldName,remove)" th:remove="tag">
+        <a
+            th:href="@{${moduleURL} + '/page/' + ${currentPage} +
+             '?sortField=' + ${fieldName} + '&sortDir=' +  ${sortField != fieldName ? sortDir : reverseSortDir} + '&numberOfEntries=' + ${numberOfEntries}}">
+            [[${columnLabel}]]
+            <span th:if="${sortField == fieldName}"><i class="fa fa-sort"></i></span>
+        </a>
+    </th>
+    <span th:if="${sortField == fieldName}"
+        th:class="${sortDir == 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down'}"></span>
+    </th>
+
+    <!-- link column -->
+    <td th:fragment="link-column(property,remove)" th:remove="tag">
+        [[${property}]]
+    </td>
+
+    <!-- pagination -->
+    <div class="clearfix row" th:if="${totalPages > 1}" th:fragment="pagination(moduleURL)">
+        <div class="hint-text col-2">Showing <b>[[${startCount}]]</b> to <b>[[${endCount}]]</b> of
+            [[${totalItems}]] entries</div>
+        <ul class="pagination col">
+
+            <li th:class="${currentPage > 1 ? 'page-item' : 'page-item disabled'}">
+                <a th:replace="fragments :: page-link(${moduleURL},1,'First')" />
+            </li>
+
+            <li th:class="${currentPage > 1 ? 'page-item' : 'page-item disabled'}">
+                <a th:replace="fragments :: page-link(${moduleURL},${currentPage - 1},'Previous')" />
+            </li>
+
+            <li th:class="${currentPage != i ? 'page-item': 'page-item active'}"
+                th:each="i : ${#numbers.sequence(1, totalPages)}">
+                <a th:replace="fragments :: page-link(${moduleURL},${i},${i})" />
+            </li>
+
+            <li th:class="${currentPage < totalPages ? 'page-item' : 'page-item disabled'}">
+                <a th:replace="fragments :: page-link(${moduleURL},${currentPage + 1},'Next')" />
+            </li>
+
+            <li th:class="${currentPage < totalPages ? 'page-item' : 'page-item disabled'}">
+                <a th:replace="fragments :: page-link(${moduleURL},${totalPages},'Last')" />
+            </li>
+        </ul>
+    </div>
+
+    <div class="clearfix row" th:if="${totalPages > 1}" th:fragment="pagination2(moduleURL)">
+        <div class="hint-text col-2">Showing <b>[[${startCount}]]</b> to <b>[[${endCount}]]</b> of
+            [[${totalItems}]] entries</div>
+        <ul class="pagination col">
+
+            <li th:class="${currentPage > 1 ? 'page-item' : 'page-item disabled'}">
+                <a th:replace="fragments :: page-link2(${moduleURL},1,'First')" />
+            </li>
+
+            <li th:class="${currentPage > 1 ? 'page-item' : 'page-item disabled'}">
+                <a th:replace="fragments :: page-link2(${moduleURL},${currentPage - 1},'Previous')" />
+            </li>
+
+            <li th:class="${currentPage != i ? 'page-item': 'page-item active'}"
+                th:each="i : ${#numbers.sequence(1, totalPages)}">
+                <a th:replace="fragments :: page-link2(${moduleURL},${i},${i})" />
+            </li>
+
+            <li th:class="${currentPage < totalPages ? 'page-item' : 'page-item disabled'}">
+                <a th:replace="fragments :: page-link2(${moduleURL},${currentPage + 1},'Next')" />
+            </li>
+
+            <li th:class="${currentPage < totalPages ? 'page-item' : 'page-item disabled'}">
+                <a th:replace="fragments :: page-link2(${moduleURL},${totalPages},'Last')" />
+            </li>
+        </ul>
+    </div>
+
+    <!-- per page link-->
+
+    <a th:fragment="page-link(moduleURL,pageNumb,label)"
+        th:href="@{${moduleURL} + '/page/' + ${pageNumb} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} + '&numberOfEntries=' + ${numberOfEntries}} + ${keyword != null ? '&keyword=' + keyword : ''}"
+        class="page-link">
+        [[${label}]]
+    </a>
+    <a th:fragment="page-link2(moduleURL,pageNumb,label)"
+        th:href="@{${moduleURL} + '/page/' + ${pageNumb} + '?sortField=' + ${sortField} + '&sortDir=' + ${sortDir} +  ${keyword != null ? '&keyword=' + keyword : ''}}"
+        class="page-link">
+        [[${label}]]
+    </a>
+
+
+
+    <div th:fragment="format_currency(amount)" th:remove="tag">
+        <span>$ </span>[[${#numbers.formatDecimal(amount, 1, 'COMMA', 2, 'POINT')}]]
+    </div>
+
+    <div th:fragment="currency_input(amount)" th:remove="tag">
+        <input type="text" readonly class="form-control"
+            th:value="${'$ ' + #numbers.formatDecimal(amount, 1,  'COMMA', 2, 'POINT')}">
+    </div>
+
+    <div th:fragment="format_time(dateTime)" th:remove="tag">
+        <span th:text="${#dates.format(dateTime, 'yyyy-MM-dd HH:mm:ss')}"></span>
+    </div>
+</body>
+
+</div>
+
+</html>

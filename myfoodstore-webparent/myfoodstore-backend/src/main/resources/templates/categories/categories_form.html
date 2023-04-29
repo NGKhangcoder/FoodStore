@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <head th:replace="head :: page_head('Foodstore - Category','tag')" />
+    <link rel="stylesheet" type="text/css" th:href="@{/templateStyle.css}" />
+    <link rel="stylesheet" th:href="@{/base.css}">
+</head>
+
+<body>
+    <div class="container-fluid">
+
+        <div th:replace="navigation :: navigation" />
+
+        <form th:action="@{/categories/save}" method="post" style=" margin: 20px auto" th:object="${category}"
+            class="bg-white" enctype="multipart/form-data" onsubmit="return checkUnique(this)">
+            <input type="hidden" th:field="*{id}" />
+            <div class="border border-secondary rounded p-3">
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Name Category: </label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" th:field="*{name}" required minlength="8"
+                            maxlength="128" />
+                    </div>
+                </div>
+
+
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Parent Category:</label>
+
+                    <div class="col-sm-8">
+                        <select class="form-control" th:field="*{parent}">
+                            <option value="0">[No Parent]</option>
+                            <th:block th:each="cat : ${listParents}">
+                                <option th:value="${cat.id}">[[${cat.name}]]</option>
+                            </th:block>
+
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Image:</label>
+
+                    <div class="col-sm-8">
+                        <input type="hidden" th:field="*{image}" />
+                        <input type="file" id="fileImage" name="fileImage" accept="image/png, image/jpeg"
+                            th:required="${category.imagePath == null}" class="mb-2" />
+
+                        <div class="mt-2">
+                            <img id="thumbnail" alt="Image preview" th:src="@{${category.imagePath}}"
+                                class="img-fluid" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Enabled:</label>
+
+                    <div class="col-sm-8">
+                        <input type="checkbox" th:field="*{enabled}" />
+                    </div>
+                </div>
+
+
+                <div class="text-center">
+                    <input type="submit" value="Save" class="btn btn-primary m-3" />
+                    <input type="button" value="Cancel" class="btn btn-secondary" id="buttonCancel" />
+                </div>
+            </div>
+        </form>
+
+
+        <div th:replace="modal_fragments :: modal_dialog" />
+        <div th:replace="footer :: footer" />
+
+    </div>
+
+    <script type="text/javascript">
+        MAX_FILE_SIZE = 102400;
+        moduleURL = "[[@{/categories}]]";
+
+        function checkUnique(form) {
+            catId = $("#id").val();
+            catName = $("#name").val();
+            csrfValue = $("input[name='_csrf']").val();
+
+            url = "[[@{/categories/check_unique}]]";
+
+            params = { id: catId, name: catName, _csrf: csrfValue };
+
+            $.post(url, params, function (response) {
+                if (response == "OK") {
+                    form.submit();
+                } else if (response == "DuplicateName") {
+                    showWarningModal("There is another category having same name " + catName);
+                } else {
+                    showErrorModal("Unknown response from server");
+                }
+            }).fail(function () {
+                showErrorModal("Could not connect to the server");
+            });
+
+            return false;
+        }
+    </script>
+</body>
+
+</html>

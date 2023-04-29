@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <head th:replace="head :: page_head('Foodstore - Category','tag')" />
+    <link rel="stylesheet" type="text/css" th:href="@{/templateStyle.css}" />
+    <link rel="stylesheet" th:href="@{/base.css}">
+</head>
+
+<body>
+    <div class="container-fluid">
+
+        <div th:replace="navigation :: navigation" />
+
+        <form th:action="@{/users/save}" method="post" style=" margin: 20px auto" th:object="${user}" class="bg-white"
+            enctype="multipart/form-data" onsubmit="return checkEmailUnique(this);">
+            <input type="hidden" th:field="*{id}" />
+            <div class="border border-secondary rounded p-3">
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">E-mail:</label>
+                    <div class="col-sm-6">
+                        <input type="email" class="form-control" th:field="*{email}" required minlength="8"
+                            maxlength="128" />
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">First Name:</label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" th:field="*{firstName}" required minlength="2"
+                            maxlength="45" />
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Last Name:</label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" th:field="*{lastName}" required minlength="2"
+                            maxlength="45" />
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Password:</label>
+                    <div class="col-sm-6 password-field">
+
+                        <input th:if="${user.id == null}" type="password" class="form-control passwordInput"
+                            th:field="*{password}" required minlength="8" maxlength="20" />
+
+                        <input th:if="${user.id != null}" type="password" class="form-control passwordInput"
+                            th:field="*{password}" minlength="8" maxlength="20" />
+                        <span><i class="fas fa-eye passwordShowOffIcon"></i></span>
+
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Roles:</label>
+                    <div class="col-sm-6">
+                        <th:block th:each="role : ${listRoles}">
+                            <input type="checkbox" th:field="*{roles}" th:text="${role.name}" th:value="${role.id}"
+                                class="m-2" />
+                            - <small>[[${role.description}]]</small>
+                            <br />
+                        </th:block>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Enabled:</label>
+                    <div class="col-sm-6">
+                        <input type="checkbox" th:field="*{enabled}" />
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Photos:</label>
+                    <div class="col-sm-6">
+                        <input type="hidden" th:field="*{photos}" />
+                        <input type="file" id="fileImage" name="image" accept="image/png, image/jpeg" class="mb-2" />
+                        <img id="thumbnail" alt="Photos preview" th:src="@{${user.photosImagePath}}"
+                            class="img-fluid" />
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <input type="submit" value="Save" class="btn btn-primary m-3" />
+                    <input type="button" value="Cancel" class="btn btn-secondary" id="buttonCancel" />
+                </div>
+            </div>
+        </form>
+
+
+        <div th:replace="modal_fragments :: modal_dialog" />
+        <div th:replace="footer :: footer" />
+
+    </div>
+
+    <script type="text/javascript">
+        MAX_FILE_SIZE = 102400;
+        moduleURL = "[[@{/users}]]";
+        function checkEmailUnique(form) {
+            url = "[[@{/users/check_email}]]";
+            userEmail = $("#email").val();
+            userId = $("#id").val();
+            csrfValue = $("input[name='_csrf']").val();
+            params = {
+                id: userId,
+                email: userEmail,
+                _csrf: csrfValue
+            };
+            $.post(url, params, function (isEmailDuplicated) {
+                if (isEmailDuplicated) {
+                    showWarningModal("There is another user having the email " + userEmail);
+                } else if (!isEmailDuplicated) {
+                    form.submit();
+                } else {
+                    showWarningModal("There is another user having the email " + userEmail);
+                }
+            }).fail(function () {
+                showWarningModal("There is another user having the email " + userEmail);
+            });
+            return false;
+        }
+
+    </script>
+</body>
+
+</html>

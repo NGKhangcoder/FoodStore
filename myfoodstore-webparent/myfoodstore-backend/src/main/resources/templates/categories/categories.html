@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <head th:replace="head :: page_head('Foodstore - Categories','tag')" />
+    <link rel="stylesheet" type="text/css" th:href="@{/templateStyle.css}" />
+    <link rel="stylesheet" th:href="@{/base.css}">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div th:replace="navigation :: navigation" />
+
+        <div class="alert alert-success text-center mt-2" th:if="${message}">
+            [[${message}]]
+        </div>
+
+        <div class="text-center mt-2">
+            <h2 class="text-center text-dark">Categories Manage</h2>
+        </div>
+        <div class="mt-2">
+            <a th:href="@{/categories/new}" title="add new category" class=" fa-2x mr-2"><i
+                    class="fas fa-utensils"></i></a>
+            <a th:href="@{/categories/export/csv}" class="fas fa-file-csv fa-2x mr-2" style="color:#6d9820;"></a>
+        </div>
+
+        <div class="table-responsive ">
+            <div class="table-wrapper">
+                <div class="table-title">
+                    <form th:action="@{/categories/page/1}" id="searchForm">
+                        <input type="hidden" name="sortField" th:value="${sortField}">
+                        <input type="hidden" name="sortDir" th:value="${sortDir}">
+                        <div class="row">
+                            <div class="col">
+                                <div class="search-box">
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fas fa-search"></i></span>
+
+                                        <input type="text" class="form-control" th:value="${keyword}" name="keyword"
+                                            placeholder="Search&hellip;">
+
+                                        <button type="button" class="btn btn-secondary" onclick="clearFilter()">
+                                            <i class="fas fa-eraser"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <table class="table table-bordered full-details">
+                    <thead>
+                        <tr>
+                            <th>
+                                <th th:replace="fragments :: label-column('/categories','ID','id','tag')" />
+                            </th>
+                            <th>
+                                <th th:replace="fragments :: label-column('/categories','Name','name','tag')" />
+                            </th>
+                            <th>Image</th>
+                            <th>
+                                <th th:replace="fragments :: label-column('/categories','Status','enabled','tag')" />
+                            </th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="category : ${listCategories}">
+                            <td>
+                                <td th:replace="fragments :: link-column(${category.id},'tag')" />
+                            </td>
+                            <td>
+                                <td th:replace="fragments :: link-column(${category.name},'tag')" />
+                            </td>
+                            <td class="text-center">
+                                <span th:if="${category.image == null}"
+                                    class="fas fa-portrait fa-3x icon-silver"></span>
+                                <img th:if="${category.image != null}" th:src="@{${category.imagePath}}"
+                                    style="width: 100px" />
+                            </td>
+                            <td>
+                                <div
+                                    th:replace="fragments :: status('/categories/' +${category.id},${category.enabled},'none')" />
+                            </td>
+                            <td>
+                                <a href="#" class="view" title="View" data-toggle="tooltip">
+                                    <i class="far fa-eye"></i>
+                                </a>
+                                <div th:replace="fragments :: edit('/categories/edit/' + ${category.id},'tag')" />
+                                <div
+                                    th:replace="fragments :: delete('/categories/delete/' + ${category.id},${category.id},${!category.hasChildren},'tag')" />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <div class="less-details">
+                    <div th:each="category : ${listCategories}" class="section_container ">
+                        <div class="first_section section text-center ">
+                            <img th:if="${category.image != null}" th:src="@{${category.imagePath}}"
+                                style="width: 100px" class="rounded-circle" />
+                            <img th:if="${category.image == null}" th:src="@{/images/default-category.png}"
+                                class="image_less_details">
+                            <div class="ml-4">
+                                <td th:replace="fragments :: link-column(${category.id},'tag')" />
+                            </div>
+                        </div>
+
+                        <div class="second_section section mx-5  ">
+                            <div>
+                                <td th:replace="fragments :: link-column(${category.name},'tag')" />
+                            </div>
+                        </div>
+
+                        <div class="third_section  section ">
+                            <div
+                                th:replace="fragments :: status('/categories/' +${category.id},${category.enabled},'none')" />
+
+                            <div class="icons-action d-flex flex-column">
+                                <a href="#" class="view" title="View" data-toggle="tooltip">
+                                    <i class="far fa-eye"></i>
+                                </a>
+                                <div th:replace="fragments :: edit('/categories/edit/' + ${category.id},'tag')" />
+                                <div
+                                    th:replace="fragments :: delete('/categories/delete/' + ${category.id},${category.id},${!category.hasChildren},'tag')" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div th:replace="fragments :: pagination('/categories')" />
+            </div>
+        </div>
+
+        <div th:replace="modal_fragments :: confirm_modal" />
+        <!-- footer -->
+        <div th:replace="footer :: footer" />
+    </div>
+    <script type="text/javascript">
+        moduleURL = "[[@{/categories}]]";
+        $(document).ready(function () {
+
+            $(".link-delete").on("click", function (e) {
+                e.preventDefault();
+                showDeleteConfirmModal($(this), 'category');
+            });
+
+            $("#entryDropdown").on("change", function () {
+                $("#searchForm").submit();
+            });
+        });
+    </script>
+
+</body>
+
+</html>
